@@ -3,9 +3,9 @@ pragma solidity >=0.4.21 <0.9.0;
 
 contract TestToken {
     address public owner;
-    string public name = "TestToken";
-    string public symbol = "TST";
-    uint256 public total_supply = 1000000000000000000000000; // 1million token supply *18
+    string public name = "Xext Token";
+    string public symbol = "XXT";
+    uint256 public total_supply = 1000000000000000000000000; // 1million token supply /18
     uint8 public decimals = 18;
     address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
@@ -52,8 +52,8 @@ contract TestToken {
         return true;
     }
 
-    function getTokenName() public view  returns(string memory) {
-        return name;
+    function getTokenSymbol() public view  returns(string memory) {
+        return symbol;
     }
 
 }

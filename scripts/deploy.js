@@ -1,28 +1,25 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
 const hre = require("hardhat");
+require('dotenv').config()
 
+
+
+const { ALCHEMY_SEPOLIA_RPC_URL, WALLET_PRIVATE_KEY, ETHERSCAN_API_KEY, LOCAL_WALLET } = process.env;
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  console.log(LOCAL_WALLET, "WALEEEEEEEE");
 
-  const lockedAmount = hre.ethers.parseEther("0.001");
+  const tokenContractInstance = await hre.ethers.getContractFactory("TestToken");
+  const stakingContractInstance = await hre.ethers.getContractFactory("TokenStaking");
 
-  const lock = await hre.ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
+  const tokenContract = await tokenContractInstance.deploy()
+  // await tokenContract.deployed()
+  console.log(tokenContract.address, "Token Contract adress");
 
-  await lock.waitForDeployment();
+  const stakingContract = await stakingContractInstance.deploy(tokenContract.address)
+  // await stakingContract.deployed()
+  await tokenContract.transfer(stakingContract.address, "500000000000000000000000") // Divide by 1*10**18 = 500k
+  await tokenContract.transfer(LOCAL_WALLET, '1000000000000000000000'); //=1k
+  console.log(stakingContract.address, "Staking Contract adress");
 
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere

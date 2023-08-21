@@ -2,15 +2,15 @@
 pragma solidity >=0.4.21 <0.9.0;
 import "./Token.sol";
 
-contract TokenStacking{
+contract TokenStaking{
 
     string public name = "Yield Farming / Token Dapp";
     TestToken public testToken;
      //
      address public owner;
     // % Rturns for stakes
-     uint256 public dailyAPY=100;
-     uint256 public customAPY=137;
+     uint256 public defaultAPY = 100;
+     uint256 public customAPY = 137;
 
     // Stakes, Custom and Normal Stakes
      uint256 public totalStaked;
@@ -31,7 +31,7 @@ contract TokenStacking{
     address[] public customStakers;
 
 
-
+        
     constructor(TestToken _testToken){
         testToken =_testToken;
         owner = msg.sender;
@@ -100,6 +100,49 @@ contract TokenStacking{
     }
    
    // Airdrops
+
+    function redistributeReWards() public{
+        require(msg.sender == owner, "Only owners are permitted to this functions");
+        for (uint256 i=0; i < stakers.length; i++){
+            address recipient = stakers[i];
+            uint256 balance = stakingBalance[recipient] * defaultAPY;
+            balance = balance / 100000;
+            if (balance > 0){
+                testToken.transfer(recipient, balance);
+            }
+
+        }
+
+    }
+
+    //Custom Airdrops
+
+     function customRewards() public {
+        require(msg.sender == owner, "Only contract creator can redistribute");
+        for (uint256 i = 0; i < customStakers.length; i++) {
+            address recipient = customStakers[i];
+            uint256 balance = customStakingBalance[recipient] * customAPY;
+            balance = balance / 100000;
+
+            if (balance > 0) {
+                testToken.transfer(recipient, balance);
+            }
+        }
+    }
+
+    function changeAPY(uint64 _value) public {
+        require(msg.sender == owner, "Only contract owners can access this function");
+        require(_value > 0, "APY Value must be greater than 100");
+        customAPY = _value;
+
+    }
+
+     function claimTst() public {
+        address recipient = msg.sender;
+        uint256 tst = 1000000000000000000000;
+        uint256 balance = tst;
+        testToken.transfer(recipient, balance);
+    }
 
 
 
